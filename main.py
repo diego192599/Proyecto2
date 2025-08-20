@@ -44,3 +44,20 @@ class Empleado():
         return self.salario_base + bono
 
 class Proveedor():
+    def __init__(self,id_provedor,nombre,empresa,telefono,direccion,correo,id_categoria):
+        self.id_provedor=id_provedor
+        self.nombre=nombre
+        self.empresa=empresa
+        self.telefono=telefono
+        self.direccion=direccion
+        self.correo=correo
+        self.id_categoria=id_categoria
+
+
+class Compra():
+    def __init__(self, id_compra, fecha, id_proveedor, id_empleado):
+        self.id_compra = id_compra
+        self.fecha = fecha
+        self.id_proveedor = id_proveedor
+        self.id_empleado = id_empleado
+        self.detalles = []
