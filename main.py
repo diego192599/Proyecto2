@@ -8,15 +8,39 @@ class Producto():
         self.total_ventas=total_ventas
         self.stock=stock
 
-    def __str__(self):
-        return f"Codigo{self.codigo_producto} - Nombre: {self.nombre} - Precio: {self.precio} "
+    def actualizar_Stock(self,cantidad,tipo):
+        if tipo=='compra':
+            self.stock+=cantidad
+            self.total_compras+=cantidad
+        elif tipo=='venta':
+            self.stock-=cantidad
+            self.total_ventas+=cantidad
 
 class Categorias():
     def __init__(self,id_categoria,nombre):
         self.id_categoria=id_categoria
         self.nombre=nombre
 
-    def __str__(self):
-        return f"Id Categoria: {self.id_categoria}- Nombre de la categoria: {self.nombre}"
-
 class Cliente():
+     def __init__(self,nit,nombre,telefono,direccion,correo):
+         self.nit=nit
+         self.nombre=nombre
+         self.telefono=telefono
+         self.direccion=direccion
+         self.correo=correo
+
+class Empleado():
+    def __init__(self, id_empleado, nombre, telefono, direccion, correo, salario_base):
+        self.id_empleado = id_empleado
+        self.nombre = nombre
+        self.telefono = telefono
+        self.direccion = direccion
+        self.correo = correo
+        self.salario_base = salario_base
+        self.ventas_realizadas = 0
+
+    def calcular_salario(self):
+        bono = self.ventas_realizadas * 0.05
+        return self.salario_base + bono
+
+class Proveedor():
