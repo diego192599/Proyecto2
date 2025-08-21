@@ -20,6 +20,25 @@ class Producto():
             else:
                 print("Error: No hay suficiente stock para la venta.")
                 return False
+class Gestion_Procudctos():
+    contador=0
+    def __init__(self):
+        self.productos={}
+
+    def agregar_Producto(self):
+        while True:
+            print("---Agregar Producto---")
+            Gestion_Procudctos.contador+=1
+            codigo_producto=input("Ingrese el codigo del producto: ")
+            id_categoria=input("Ingrese la categoria del producto: ")
+            nombre=input("Ingrese el nombre del producto: ")
+            precio=float(input("Ingrese el precio del producto: "))
+            nuevo_producto=Producto(codigo_producto,id_categoria,nombre,precio,0,0,0)
+            self.productos[codigo_producto]=nuevo_producto
+            print(f"Producto '{nombre}' agregado correctamente ")
+            continuar=input("¿Desea agregar otro producto (s/n)?").lower()
+            if continuar!='s':
+                break
 
 class Categorias():
     def __init__(self,id_categoria,nombre):
