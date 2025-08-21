@@ -50,6 +50,13 @@ class Empleado():
 
     def mostrar_info(self):
         return f"{self.id_empleado}- {self.nombre}- Salario: {self.calcular_salario():.2f}"
+class Administrado(Empleado):
+    def __init__(self, id_empleado, nombre, telefono, direccion, correo, salario_base, password):
+        super().__init__(id_empleado, nombre, telefono, direccion, correo, salario_base)
+        self.password = password
+    def verificar_password(self,password_ingresada):
+        print("Veridicar si usted es administrador")
+        return self.password==password_ingresada
 
 class Proveedor():
     def __init__(self,id_provedor,nombre,empresa,telefono,direccion,correo,id_categoria):
