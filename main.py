@@ -53,6 +53,27 @@ class Proveedor():
         self.correo=correo
         self.id_categoria=id_categoria
 
+class Venta:
+    def __init__(self, id_venta, fecha, nit_cliente, id_empleado):
+        self.id_venta = id_venta
+        self.fecha = fecha
+        self.nit_cliente = nit_cliente
+        self.id_empleado = id_empleado
+        self.detalles = []
+
+    def calcular_total(self):
+        return sum(detalle.subtotal for detalle in self.detalles)
+
+
+class DetalleVenta:
+    def __init__(self, id_detalle, id_venta, codigo_producto, cantidad, precio):
+        self.id_detalle = id_detalle
+        self.id_venta = id_venta
+        self.codigo_producto = codigo_producto
+        self.cantidad = cantidad
+        self.precio = precio
+        self.subtotal = cantidad * precio
+
 
 class Compra():
     def __init__(self, id_compra, fecha, id_proveedor, id_empleado):
@@ -61,3 +82,19 @@ class Compra():
         self.id_proveedor = id_proveedor
         self.id_empleado = id_empleado
         self.detalles = []
+
+    def calcular_total(self):
+        total=0
+        for detalle in self.detalles:
+            total=total+detalle.subtotal
+        return total
+
+class DetalleCompra:
+    def __init__(self, id_detalle, id_compra, codigo_producto, cantidad, precio_compra, fecha_caducidad):
+        self.id_detalle = id_detalle
+        self.id_compra = id_compra
+        self.codigo_producto = codigo_producto
+        self.cantidad = cantidad
+        self.precio_compra = precio_compra
+        self.fecha_caducidad = fecha_caducidad
+        self.subtotal = cantidad * precio_compra
