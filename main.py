@@ -8,13 +8,18 @@ class Producto():
         self.total_ventas=total_ventas
         self.stock=stock
 
-    def actualizar_Stock(self,cantidad,tipo):
-        if tipo=='compra':
-            self.stock+=cantidad
-            self.total_compras+=cantidad
-        elif tipo=='venta':
-            self.stock-=cantidad
-            self.total_ventas+=cantidad
+    def actualizar_stock(self, cantidad, tipo):
+        if tipo == 'compra':
+            self.stock += cantidad
+            self.total_compras += cantidad
+        elif tipo == 'venta':
+            if self.stock >= cantidad:
+                self.stock -= cantidad
+                self.total_ventas += cantidad
+                return True
+            else:
+                print("Error: No hay suficiente stock para la venta.")
+                return False
 
 class Categorias():
     def __init__(self,id_categoria,nombre):
@@ -42,6 +47,9 @@ class Empleado():
     def calcular_salario(self):
         bono = self.ventas_realizadas * 0.05
         return self.salario_base + bono
+
+    def mostrar_info(self):
+        return f"{self.id_empleado}- {self.nombre}- Salario: {self.calcular_salario():.2f}"
 
 class Proveedor():
     def __init__(self,id_provedor,nombre,empresa,telefono,direccion,correo,id_categoria):
