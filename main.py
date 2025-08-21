@@ -22,6 +22,7 @@ class Producto():
                 return False
 class Gestion_Procudctos():
     contador=0
+    limite_Stock=50
     def __init__(self):
         self.productos={}
 
@@ -39,6 +40,42 @@ class Gestion_Procudctos():
             continuar=input("¿Desea agregar otro producto (s/n)?").lower()
             if continuar!='s':
                 break
+    def eliminar(self):
+        if not self.productos:
+            print("No hay productos")
+            return
+        print("1. Eliminar por codigo")
+        print("2. Eliminar por maximo de stock")
+        opcion=input("Seleccione una opcion: ")
+        if opcion=="1":
+            codigo=input("Ingrese el codigo a eliminar: ")
+            if codigo in self.productos:
+                del self.productos[codigo]
+                print("Producto eliminado")
+            else:
+                print("Producto no encontrado")
+        elif opcion=="2":
+            eliminar=[codigo for codigo , prod in self.productos.items()
+                      if prod.stock>Gestion_Procudctos.limite_Stock]
+            for codigo in eliminar:
+                del self.productos[codigo]
+            print(f"{len(eliminar)} productos eliminados correctamente")
+        else:
+            print("Opcion no valida")
+
+    def buscar(self):
+        if not self.productos:
+            print("No hay productos")
+            return
+        criterio=input("Ingrese el nombre o codigo del producto a buscar: ").lower()
+        encontrados=[p for p in self.productos.values()
+                     if criterio in p.nombre.lower or criterio==p.codigo_productos]
+        if encontrados:
+            for prod in encontrados:
+                print(f"{prod.codigo_productos}- {prod.nombre}- Stock: {prod.stock}")
+        else:
+            print("Productos no encontrados")
+
 
 class Categorias():
     def __init__(self,id_categoria,nombre):
