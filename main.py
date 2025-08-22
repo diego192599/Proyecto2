@@ -140,6 +140,38 @@ class Proveedor():
         self.direccion=direccion
         self.correo=correo
         self.id_categoria=id_categoria
+class Gestion_Proveedor:
+    def __init__(self,categoria):
+        self.proveedores={}
+        self.categoria=categoria
+        self.contador_proveedores=0
+
+    def agregar(self):
+        id_proveedor=input("Ingrese el id del proveedor: ")
+        if id_proveedor in self.proveedores:
+            print("El proveedor ya fue registrado")
+            return
+        nombre=input("Ingrese el nombre: ")
+        empresa=input("Ingrese la empresa del la cual viene: ")
+        telefono=input("Telefono: ")
+        direccion=input("Ingrese la direccion de donde proviene: ")
+        correo=input("Ingrese el correo de la empresa: ")
+        id_categoria=input("Ingrese la ID de la categoria: ")
+        if id_categoria not in self.categoria:
+            print("La categoria no existe")
+            return
+        self.proveedores[id_proveedor]=Proveedor(id_proveedor,nombre,empresa,telefono,direccion,correo,id_categoria)
+        self.contador_proveedores+=1
+        print("Se agrego correctamente el proveedor")
+        print(f"Total de proveedores registrados: {self.contador_proveedores}")
+
+    def listar(self):
+        if not self.proveedores:
+            print("No hay proveedores")
+            return
+        for p in self.proveedores.values():
+            cat=self.categoria[p.id_categoria].nombre
+            print(f"[{p.id_proveedor}] {p.nombre} ({p.empresa}) - Categoría: {cat}")
 
 class Venta:
     def __init__(self, id_venta, fecha, nit_cliente, id_empleado):
@@ -169,10 +201,11 @@ class Compra():
         self.detalles = []
 
     def calcular_total(self):
-        total=0
-        for detalle in self.detalles:
-            total=total+detalle.subtotal
+        total = 0
+        for d in self.detalles:
+            total += d.subtotal
         return total
+
 
 class DetalleCompra:
     def __init__(self, id_detalle, id_compra, codigo_producto, cantidad, precio_compra, fecha_caducidad):
@@ -183,3 +216,40 @@ class DetalleCompra:
         self.precio_compra = precio_compra
         self.fecha_caducidad = fecha_caducidad
         self.subtotal = cantidad * precio_compra
+
+class Gestion_compra:
+    def __init__(self,productos,proveedores):
+        self.compras={}
+        self.productos=productos
+        self.proveedores=proveedores
+
+    def registrar_compras(self):
+        id_compra=input("ID compras: ")
+        fecha=input("Fecha de Vencimiento (YYYY/MM/DD): ")
+        id_proveedor=input("Ingrese ID proveedor: ")
+        id_empleado=input("Ingrese ID Empleado: ")
+        if id_proveedor not in self.proveedores:
+            print("No existe ese proveedor")
+            return
+        compra=Compra(id_compra,fecha,id_proveedor,id_empleado)
+        while True:
+            codigo_producto = input("Código del producto (o 'fin' para terminar): ")
+            if codigo_producto.lower() == 'fin':
+                break
+            if codigo_producto not in self.productos:
+                print("Producto no encontrado.")
+                continue
+
+            cantidad = int(input("Cantidad: "))
+            precio = float(input("Precio de compra: "))
+            fecha_caducidad = input("Fecha de caducidad (YYYY-MM-DD): ")
+
+            detalle = DetalleCompra(len(compra.detalles) + 1, id_compra, codigo_producto, cantidad, precio,
+                                    fecha_caducidad)
+            compra.agregar_detalle(detalle)
+
+            self.productos[codigo_producto].stock += cantidad
+            self.productos[codigo_producto].total_compras += cantidad
+
+        self.compras[id_compra] = compra
+        print(f"Compra registrada. Total: {compra.calcular_total()}")
