@@ -25,6 +25,18 @@ class Gestion_Procudctos():
     limite_Stock=50
     def __init__(self):
         self.productos={}
+        self.categorias={}
+    def agregar_categoria(self):
+        while True:
+            print("---Agregar Categoria---")
+            idc=input("Ingrese el codigo de la categoria: ")
+            nombre=input("Ingrese el nombre de la categoria: ")
+            nueva_categoria=Categorias(idc,nombre)
+            self.categorias[idc]=nueva_categoria
+            print("La categoria se agrego correctamete")
+            continua=input("¿Dese seguir agregando categorias (s/n)?").lower()
+            if continua!='s':
+                break
 
     def agregar_Producto(self):
         while True:
