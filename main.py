@@ -40,6 +40,7 @@ class Gestion_Procudctos():
             continuar=input("¿Desea agregar otro producto (s/n)?").lower()
             if continuar!='s':
                 break
+
     def eliminar(self):
         if not self.productos:
             print("No hay productos")
@@ -131,9 +132,6 @@ class Venta:
         self.nit_cliente = nit_cliente
         self.id_empleado = id_empleado
         self.detalles = []
-
-    def calcular_total(self):
-        return sum(detalle.subtotal for detalle in self.detalles)
 
 
 class DetalleVenta:
