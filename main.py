@@ -160,6 +160,26 @@ class Gestion_empleado:
             return
         for e in self.empleados.values():
             print(e.mostrar_info())
+    def buscar_empleado(self):
+        criterio=input("Ingrese el ID o nombre: ").lower()
+        encontrados=[
+            e for e in self.empleados.values()
+            if criterio in e.nombre.lower() or criterio==e.id_empleado
+        ]
+        if encontrados:
+            for e in encontrados:
+                print(e.mostrar_info())
+        else:
+            print("Empleado no encontrado")
+
+    def despedir_empleado(self):
+        id_empleado=input("Ingrese el ID del empleado a despedir: ")
+        if id_empleado in self.empleados:
+          self.empleados[id_empleado]="Despedido"
+          print(f"Empleado {self.empleados[id_empleado].nombre} a sido despedido")
+        else:
+            print("No hay ningun empleado con ese ID")
+
 class Proveedor():
     def __init__(self,id_provedor,nombre,empresa,telefono,direccion,correo,id_categoria):
         self.id_provedor=id_provedor
