@@ -148,12 +148,29 @@ class OrdenadorProductos:
             return self.quicksort(menores, criterio) + [pivote] + self.quicksort(mayores, criterio)
 
 class Cliente():
-     def __init__(self,nit,nombre,telefono,direccion,correo):
+     def __init__(self,nit,nombre,telefono,correo):
          self.nit=nit
          self.nombre=nombre
          self.telefono=telefono
-         self.direccion=direccion
          self.correo=correo
+
+class Gestion_Cliente:
+    def __init__(self):
+        self.clientes={}
+    def Agregar_Cliente(self):
+        id_cliente=input("Ingrese el ID del cliente: ")
+        nombre=input("Ingrese su nombre: ")
+        telefono=input("Ingrese su numero de telefono: ")
+        correo=input("Ingrese su correo electronico personal: ")
+        self.clientes[id_cliente]=Cliente(id_cliente,nombre,telefono,correo)
+        print(f"El cliente {nombre} se agrego correctamente")
+
+    def mostrar(self):
+        if not self.clientes:
+            print("No hay clientes")
+            return
+
+
 
 class Empleado():
     def __init__(self, id_empleado, nombre, telefono, direccion, correo, salario_base):
