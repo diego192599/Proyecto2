@@ -99,6 +99,29 @@ class Gestion_Procudctos:
         else:
             print("Productos no encontrados")
 
+class OrdenadorProductos:
+    def quicksort(self, lista, criterio):
+        if len(lista) <= 1:
+            return lista
+        else:
+            pivote = lista[0]
+            if criterio == "nombre":
+                menores = [x for x in lista[1:] if x.nombre.lower() <= pivote.nombre.lower()]
+                mayores = [x for x in lista[1:] if x.nombre.lower() > pivote.nombre.lower()]
+            elif criterio == "precio":
+                menores = [x for x in lista[1:] if x.precio <= pivote.precio]
+                mayores = [x for x in lista[1:] if x.precio > pivote.precio]
+            elif criterio == "stock":
+                menores = [x for x in lista[1:] if x.stock <= pivote.stock]
+                mayores = [x for x in lista[1:] if x.stock > pivote.stock]
+            elif criterio == "id_producto":
+                menores = [x for x in lista[1:] if x.id_producto <= pivote.id_producto]
+                mayores = [x for x in lista[1:] if x.id_producto > pivote.id_producto]
+            else:
+                return lista
+
+            return self.quicksort(menores, criterio) + [pivote] + self.quicksort(mayores, criterio)
+
 class Cliente():
      def __init__(self,nit,nombre,telefono,direccion,correo):
          self.nit=nit
