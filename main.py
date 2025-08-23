@@ -123,6 +123,8 @@ class Empleado():
 
     def mostrar_info(self):
         return f"{self.id_empleado}- {self.nombre}- Salario: {self.calcular_salario():.2f}"
+
+
 class Administrado(Empleado):
     def __init__(self, id_empleado, nombre, telefono, direccion, correo, salario_base, password):
         super().__init__(id_empleado, nombre, telefono, direccion, correo, salario_base)
@@ -131,6 +133,33 @@ class Administrado(Empleado):
         print("Veridicar si usted es administrador")
         return self.password==password_ingresada
 
+class Gestion_empleado:
+    contador=0
+    def __init__(self,admin):
+        self.empleados={}
+        self.admin=admin
+
+    def agregar_empleado(self):
+        if not self.admin.verificar_password():
+            print("Solo el Adminiistrador puede agregar empleados")
+            return
+        Gestion_empleado.contador+=1
+        print(f"\n---Agregar Empleado{Gestion_empleado.contador}---")
+        id_empledado=input("Ingrese la ID del nuevo empleado: ")
+        nombre=input("Nombre del empleado: ")
+        telefono=input("El numero que nos servira para contactarlo: ")
+        direccion=input("Ingrese la direccion: ")
+        correo=input("Ingrese el correo personal del empleado: ")
+        saliro_base=float(input("Ingrese el salario que recibira el empleado: "))
+        nuevo=Empleado(id_empledado,nombre,telefono,direccion,correo,saliro_base)
+        self.empleados[id_empledado]=nuevo
+        print(f"Empleado {nombre} agregado correctamente")
+    def mostrar_empleado(self):
+        if not self.empleados:
+            print("No hay empleados registrados")
+            return
+        for e in self.empleados.values():
+            print(e.mostrar_info())
 class Proveedor():
     def __init__(self,id_provedor,nombre,empresa,telefono,direccion,correo,id_categoria):
         self.id_provedor=id_provedor
