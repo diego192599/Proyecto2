@@ -28,9 +28,10 @@ class Producto():
 class Gestion_Procudctos:
     contador=0
     limite_Stock=50
-    def __init__(self, categoria):
+    def __init__(self, categoria,ordenado):
         self.productos={}
         self.categoria=categoria
+        self.ordenado=ordenado
 
     def agregar_Producto(self):
         while True:
@@ -98,6 +99,30 @@ class Gestion_Procudctos:
                 print(f"{prod.codigo_productos}- {prod.nombre}- Stock: {prod.stock}")
         else:
             print("Productos no encontrados")
+
+    def ordenar_productos(self):
+        if not self.productos:
+            print("No hay productos para ordenar.")
+            return
+
+        print("\n--- ORDENAR PRODUCTOS ---")
+        print("1. Por nombre")
+        print("2. Por precio")
+        print("3. Por cantidad")
+        print("4. Por código")
+        opcion = input("Seleccione una opción: ")
+
+        criterios = {"1": "nombre", "2": "precio", "3": "stock", "4": "id_producto"}
+        criterio = criterios.get(opcion)
+        if not criterio:
+            print("Opción inválida.")
+            return
+
+        lista_productos = list(self.productos.values())
+        ordenados = self.ordenador.quicksort(lista_productos, criterio)
+
+        for p in ordenados:
+            print(f"[{p.id_producto}] {p.nombre} | Precio: {p.precio} | Stock: {p.stock}")
 
 class OrdenadorProductos:
     def quicksort(self, lista, criterio):
@@ -217,6 +242,7 @@ class Gestion_Proveedor:
         self.proveedores={}
         self.categoria=categoria
         self.contador_proveedores=0
+
 
     def agregar(self):
         id_proveedor=input("Ingrese el id del proveedor: ")
