@@ -169,7 +169,18 @@ class Gestion_Cliente:
         if not self.clientes:
             print("No hay clientes")
             return
+        for c in self.clientes:
+            print(c.mostrar_info())
 
+    def buscar_Clientes(self):
+        criterio=input("Ingrese el nombre o ID del cliente: ").lower()
+        encotrados=[c for c in self.clientes.values()
+                    if criterio in c.nombre.lower() or criterio==c.id_cliente]
+        if encotrados:
+            for c in encotrados:
+                print(c.mostrar_info())
+        else:
+            print("Cliente no encontrado")
 
 
 class Empleado():
