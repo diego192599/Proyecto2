@@ -1,10 +1,10 @@
-class Categorias():
+class Categorias:
     def __init__(self, id_categoria, nombre):
         self.id_categoria = id_categoria
         self.nombre = nombre
 
 
-class Producto():
+class Producto:
     def __init__(self, codigo_producto, id_categoria, nombre, precio, total_compras, total_ventas, stock):
         self.codigo_producto = codigo_producto
         self.id_categoria = id_categoria
