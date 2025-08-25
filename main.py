@@ -395,6 +395,51 @@ class DetalleCompra:
         self.fecha_caducidad = fecha_caducidad
         self.subtotal = cantidad * precio_compra
 
+class gestion_detalles:
+    def __init__(self,productos):
+        self.productos=productos
+
+    def registrar_detalles(self, compra=None):
+        detalles_temporales=[]
+        while True:
+            codigo_producto=input("Ingrese el codigo del producto(o 'fin' para terminar): ")
+            if codigo_producto.lower()=='fin':
+                break
+            if codigo_producto not in self.productos:
+                print("Producto no encontrado")
+                continue
+            cantidad = int(input("Cantidad: "))
+            precio = float(input("Precio de compra: "))
+            fecha_caducidad = input("Fecha de caducidad (YYYY-MM-DD): ")
+
+            detalle = DetalleCompra(
+                id_detalle=len(detalles_temporales) + 1,
+                id_compra=compra.id_compra,
+                codigo_producto=codigo_producto,
+                cantidad=cantidad,
+                precio_compra=precio,
+                fecha_caducidad=fecha_caducidad
+            )
+            detalles_temporales.append(detalle)
+
+        if not detalles_temporales:
+            print("No se ingresaron detalles.")
+            return
+
+        print("\nResumen de los detalles ingresados:")
+        for d in detalles_temporales:
+            print(f"- {d.codigo_producto} | Cantidad: {d.cantidad} | Subtotal: {d.subtotal}")
+
+        confirmar = input("¿Desea confirmar la compra? (s/n): ").lower()
+        if confirmar == 's':
+            for d in detalles_temporales:
+                compra.agregar_detalle(d)
+                self.productos[d.codigo_producto].stock += d.cantidad
+                self.productos[d.codigo_producto].total_compras += d.cantidad
+            print("Detalles confirmados y stock actualizado.")
+        else:
+            print("Detalles descartados. No se actualizó el stock.")
+
 
 class Gestion_compra:
     def __init__(self, productos, proveedores):
