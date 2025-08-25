@@ -147,16 +147,28 @@ class OrdenadorProductos:
 
             return self.quicksort(menores, criterio) + [pivote] + self.quicksort(mayores, criterio)
 
-class Cliente():
-     def __init__(self,nit,nombre,telefono,correo):
-         self.nit=nit
-         self.nombre=nombre
-         self.telefono=telefono
-         self.correo=correo
+    def quicksort_clientes(self, lista):
+        if len(lista) <= 1:
+            return lista
+        else:
+            pivote = lista[0]
+            menores = [x for x in lista[1:] if x.total_compras <= pivote.total_compras]
+            mayores = [x for x in lista[1:] if x.total_compras > pivote.total_compras]
+            return self.quicksort_clientes(menores) + [pivote] + self.quicksort_clientes(mayores)
+
+class Cliente:
+    def __init__(self, id_cliente, nombre, correo, total_compras=0, descuento=0):
+        self.id_cliente = id_cliente
+        self.nombre = nombre
+        self.correo = correo
+        self.total_compras = total_compras
+        self.descuento = descuento
 
 class Gestion_Cliente:
-    def __init__(self):
+    def __init__(self,ordenador):
         self.clientes={}
+        self.ordenador=ordenador
+
     def Agregar_Cliente(self):
         id_cliente=input("Ingrese el ID del cliente: ")
         nombre=input("Ingrese su nombre: ")
@@ -164,6 +176,19 @@ class Gestion_Cliente:
         correo=input("Ingrese su correo electronico personal: ")
         self.clientes[id_cliente]=Cliente(id_cliente,nombre,telefono,correo)
         print(f"El cliente {nombre} se agrego correctamente")
+
+    def asignar_descuento(self, id_cliente, porcentaje):
+        if id_cliente in self.clientes:
+            self.clientes[id_cliente].descuento = porcentaje
+            print(f"Descuento de {porcentaje}% asignado a {self.clientes[id_cliente].nombre}.")
+        else:
+            print("Cliente no encontrado.")
+
+    def listar_ordenados_por_compras(self):
+        lista_clientes = list(self.clientes.values())
+        ordenados = self.ordenador.quicksort_clientes(lista_clientes)
+        for c in ordenados:
+            print(f"{c.nombre} - Compras: {c.total_compras} - Descuento: {c.descuento}%")
 
     def mostrar(self):
         if not self.clientes:
