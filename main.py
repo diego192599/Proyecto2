@@ -487,3 +487,126 @@ class Gestion_compra:
         self.compras[id_compra] = compra
         print(f"Compra registrada. Total: {compra.calcular_total()}")
 
+class Menu:
+    def __init__(self, gestion_productos, gestion_clientes, gestion_empleados, gestion_proveedores, gestion_compras, gestion_ventas):
+        self.gestion_productos = gestion_productos
+        self.gestion_clientes = gestion_clientes
+        self.gestion_empleados = gestion_empleados
+        self.gestion_proveedores = gestion_proveedores
+        self.gestion_compras = gestion_compras
+        self.gestion_ventas = gestion_ventas
+
+    def mostrar_menu(self):
+        while True:
+            print("\n=== SISTEMA DE FARMACIA ===")
+            print("1. Administrador")
+            print("2. Empleado")
+            print("3. Cliente")
+            print("4. Proveedor")
+            print("5. Salir")
+            opcion = input("Seleccione una opción: ")
+
+            match opcion:
+                case "1":
+                    self.menu_admin()
+                case "2":
+                    self.menu_empleado()
+                case "3":
+                    self.menu_cliente()
+                case "4":
+                    self.menu_proveedor()
+                case "5":
+                    print("Saliendo del sistema...")
+                    break
+                case _:
+                    print("Opción inválida.")
+
+    # ------------------ MENÚ ADMIN ------------------
+    def menu_admin(self):
+        clave = input("Ingrese la contraseña de administrador: ")
+        if clave != "admin123":
+            print("Contraseña incorrecta.")
+            return
+
+        while True:
+            print("\n--- MENÚ ADMINISTRADOR ---")
+            print("1. Gestionar productos")
+            print("2. Gestionar empleados")
+            print("3. Gestionar proveedores")
+            print("4. Ver compras registradas")
+            print("5. Volver")
+            opcion = input("Seleccione una opción: ")
+
+            match opcion:
+                case "1":
+                    self.gestion_productos.menu_productos()
+                case "2":
+                    self.gestion_empleados.menu_empleados()
+                case "3":
+                    self.gestion_proveedores.menu_proveedores()
+                case "4":
+                    self.gestion_compras.mostrar_compras()
+                case "5":
+                    break
+                case _:
+                    print("Opción inválida.")
+
+    # ------------------ MENÚ EMPLEADO ------------------
+    def menu_empleado(self):
+        while True:
+            print("\n--- MENÚ EMPLEADO ---")
+            print("1. Registrar venta")
+            print("2. Registrar compra")
+            print("3. Ver productos")
+            print("4. Volver")
+            opcion = input("Seleccione una opción: ")
+
+            match opcion:
+                case "1":
+                    self.gestion_ventas.registrar_venta()
+                case "2":
+                    self.gestion_compras.registrar_compras()
+                case "3":
+                    self.gestion_productos.mostrar_productos()
+                case "4":
+                    break
+                case _:
+                    print("Opción inválida.")
+
+    # ------------------ MENÚ CLIENTE ------------------
+    def menu_cliente(self):
+        while True:
+            print("\n--- MENÚ CLIENTE ---")
+            print("1. Ver productos")
+            print("2. Buscar producto")
+            print("3. Volver")
+            opcion = input("Seleccione una opción: ")
+
+            match opcion:
+                case "1":
+                    self.gestion_productos.mostrar_productos()
+                case "2":
+                    self.gestion_productos.buscar_producto()
+                case "3":
+                    break
+                case _:
+                    print("Opción inválida.")
+
+    # ------------------ MENÚ PROVEEDOR ------------------
+    def menu_proveedor(self):
+        while True:
+            print("\n--- MENÚ PROVEEDOR ---")
+            print("1. Registrar proveedor")
+            print("2. Ver proveedores")
+            print("3. Volver")
+            opcion = input("Seleccione una opción: ")
+
+            match opcion:
+                case "1":
+                    self.gestion_proveedores.registrar_proveedor()
+                case "2":
+                    self.gestion_proveedores.mostrar_proveedores()
+                case "3":
+                    break
+                case _:
+                    print("Opción inválida.")
