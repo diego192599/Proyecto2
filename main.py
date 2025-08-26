@@ -487,6 +487,17 @@ class Gestion_compra:
         self.compras[id_compra] = compra
         print(f"Compra registrada. Total: {compra.calcular_total()}")
 
+class Pagos:
+    def __init__(self,id_pago,id_venta,tipo_pago,monto,referencia=None):
+        self.id_pago=id_pago
+        self.id_venta=id_venta
+        self.tipo_pago=tipo_pago
+        self.monto=monto
+        self.referencia=referencia
+
+class Gestion_pago:
+
+
 class Menu:
     def __init__(self, gestion_productos, gestion_clientes, gestion_empleados, gestion_proveedores, gestion_compras, gestion_ventas):
         self.gestion_productos = gestion_productos
