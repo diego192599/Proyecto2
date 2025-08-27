@@ -496,6 +496,36 @@ class Pagos:
         self.referencia=referencia
 
 class Gestion_pago:
+    def __init__(self,ventas):
+        self.pagos={}
+        self.ventas=ventas
+
+    def registrar_Pagos(self):
+        id_pago=input("ID del pago: ")
+        id_venta=input("ID de venta a pagar: ")
+
+        if id_venta not in self.ventas:
+            print("La venta no existe")
+            return
+        tipo_pago=input("Tipo de pago (efectivo/tarjeta): ").lower()
+        monto=float(input("Monto a pagar: "))
+        referencia=None
+        if tipo_pago == "tarjeta":
+            referencia = input("Últimos 3 dígitos de la tarjeta: ")
+
+            try:
+                int(referencia)
+            except ValueError:
+                print("La referencia debe ser numérica.")
+                return
+
+            if len(referencia) != 3:
+                print("La referencia debe tener exactamente 3 dígitos.")
+                return
+
+        pago = Pagos(id_pago, id_venta, tipo_pago, monto, referencia)
+        self.pagos[id_pago] = pago
+        print("Pago registrado correctamente.")
 
 
 class Menu:
