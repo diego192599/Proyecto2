@@ -34,17 +34,40 @@ class Producto:
 
 
 class Gestion_Productos:
-    contador = 0
-    limite_stock = 50
-
     def __init__(self, categorias):
         self.productos = {}
         self.categorias = categorias
+        self.limite_stock=None
+        self.cargar_productos()
+
+    def cargar_productos(self):
+        try:
+            with open("productos.txt", "r", encoding="utf-8") as archivo:
+                for linea in archivo:
+                    linea = linea.split()
+                    if linea:
+                        codigo, id_categoria, nombre, precio, stock = linea.split(",")
+                        self.productos[codigo] = {
+                            "id_categoria": id_categoria,
+                            "nombre": nombre,
+                            "precio": float(precio),
+                            "stock": int(stock)
+                        }
+            print("Productos importados desde productos.txt")
+        except FileNotFoundError:
+         print("No existe el archivo productos.txt, se creará uno nuevo al guardar.")
+
+    def guardar_productos(self):
+        with open("productos.txt", "w", encoding="utf-8") as archivo:
+            for codigo, datos in self.productos.items():
+                archivo.write(
+                    f"{codigo},{datos['id_categoria']},{datos['nombre']},{datos['precio']},{datos['stock']}\n")
 
     def agregar_producto(self):
+        contador = 0
         while True:
-            Gestion_Productos.contador += 1
-            print(f"\n--- Agregar Producto {Gestion_Productos.contador} ---")
+            contador += 1
+            print(f"\n--- Agregar Producto {contador} ---")
 
             codigo_producto = input("Código del producto: ")
             id_categoria = input("ID de categoría: ")
@@ -60,12 +83,21 @@ class Gestion_Productos:
                 print("Precio inválido. Inténtelo de nuevo.")
                 continue
 
-            nuevo_producto = Producto(codigo_producto, id_categoria, nombre, precio, 0, 0, 0)
-            self.productos[codigo_producto] = nuevo_producto
-            print(f"Producto '{nombre}' agregado correctamente con stock inicial en 0.")
+            stock = 0
+
+            self.productos[codigo_producto] = {
+                "id_categoria": id_categoria,
+                "nombre": nombre,
+                "precio": precio,
+                "stock": stock
+            }
+
+            self.guardar_productos()
+            print(f"Producto '{nombre}' agregado y guardado correctamente con stock inicial {stock}.")
 
             continuar = input("¿Desea agregar otro producto? (s/n): ").lower()
             if continuar != 's':
+                print(f"Se agregaron {contador} producto(s) en total.")
                 break
 
     def mostrar_productos(self):
