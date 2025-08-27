@@ -317,35 +317,71 @@ class Administrador(Empleado):
 
 class Gestion_empleado:
     def __init__(self, admin):
-        self.empleados = {}
         self.admin = admin
+        self.empleados = {}
+        self.carga_empleado()
 
-    def agregar_empleado(self, password_admin):
-        if not self.admin.verificar_password(password_admin):
-            print("Solo el Administrador puede agregar empleados.")
-            return
-        print("\n---Agregar Empleado---")
-        id_empleado = input("Ingrese la ID del nuevo empleado: ")
-        nombre = input("Nombre del empleado: ")
-        telefono = input("El número que nos servirá para contactarlo: ")
-        direccion = input("Ingrese la dirección: ")
-        correo = input("Ingrese el correo personal del empleado: ")
+    def cargar_empleados(self):
         try:
-            salario_base = float(input("Ingrese el salario que recibirá el empleado: "))
-        except ValueError:
-            print("Salario inválido. Inténtelo de nuevo.")
-            return
+            with open("empleados.txt", "r", encoding="utf-8") as f:
+                for linea in f:
+                    linea = linea.strip()
+                    if not linea:
+                        continue
+                    try:
+                        id_emp, nombre, telefono, correo, password = linea.split(":")
+                        self.empleados[id_emp] = {
+                            "Nombre": nombre,
+                            "Telefono": telefono,
+                            "Correo": correo,
+                            "Password": password
+                        }
+                    except ValueError:
+                        print(f"Línea malformada en empleados.txt: {linea}")
+            print("Empleados cargados desde empleados.txt")
+        except FileNotFoundError:
+            print("No existe empleados.txt, se creará uno nuevo al guardar.")
 
-        nuevo_empleado = Empleado(id_empleado, nombre, telefono, direccion, correo, salario_base)
-        self.empleados[id_empleado] = nuevo_empleado
-        print(f"Empleado {nombre} agregado correctamente.")
+    def guardar_empleados(self):
+        with open("empleados.txt", "w", encoding="utf-8") as f:
+            for id_emp, datos in self.empleados.items():
+                f.write(f"{id_emp}:{datos['Nombre']}:{datos['Telefono']}:{datos['Correo']}:{datos['Password']}\n")
+
+    def agregar_empleado(self):
+        contador = 0
+        while True:
+            contador += 1
+            print(f"\n--- Agregar Empleado {contador} ---")
+            id_emp = input("ID del empleado: ").strip()
+            if id_emp in self.empleados:
+                print("Ya existe un empleado con ese ID. Intente otro.")
+                continue
+            nombre = input("Nombre: ").strip()
+            telefono = input("Teléfono: ").strip()
+            correo = input("Correo: ").strip()
+            password = input("Contraseña: ").strip()
+
+            self.empleados[id_emp] = {
+                "Nombre": nombre,
+                "Telefono": telefono,
+                "Correo": correo,
+                "Password": password
+            }
+
+            self.guardar_empleados()
+            print(f"Empleado '{nombre}' agregado y guardado correctamente.")
+
+            continuar = input("¿Desea agregar otro empleado? (s/n): ").lower()
+            if continuar != 's':
+                print(f"Se agregaron {contador} empleado(s) en total.")
+                break
 
     def mostrar_empleados(self):
         if not self.empleados:
             print("No hay empleados registrados.")
             return
-        for e in self.empleados.values():
-            print(e.mostrar_info())
+        for id_emp, datos in self.empleados.items():
+            print(f"[{id_emp}] {datos['Nombre']} | Tel: {datos['Telefono']} | Correo: {datos['Correo']}")
 
     def buscar_empleado(self):
         criterio = input("Ingrese el ID o nombre: ").lower()
@@ -728,8 +764,11 @@ class Menu:
             print("2. Mostrar empleados")
             print("3. Buscar empleado")
             print("4. Despedir empleado")
-            print("5. Volver")
+            print("5. Cargar empleados desde TXT")
+            print("6. Guardar empleados en TXT")
+            print("7. Volver")
             opcion = input("Seleccione una opción: ")
+
             if opcion == "1":
                 self.gestion_empleados.agregar_empleado("admin123")
             elif opcion == "2":
@@ -739,6 +778,11 @@ class Menu:
             elif opcion == "4":
                 self.gestion_empleados.despedir_empleado()
             elif opcion == "5":
+                self.gestion_empleados.cargar_empleados()
+            elif opcion == "6":
+                self.gestion_empleados.guardar_empleados()
+                print("Empleados guardados en empleados.txt")
+            elif opcion == "7":
                 break
             else:
                 print("Opción inválida.")
