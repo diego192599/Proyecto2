@@ -169,13 +169,13 @@ class OrdenadorProductos:
             mayores = [x for x in lista[1:] if x.total_compras > pivote.total_compras]
             return self.quicksort_clientes(menores) + [pivote] + self.quicksort_clientes(mayores)
 
-
 class Cliente:
-    def __init__(self, id_cliente, nombre, telefono, correo, total_compras=0, descuento=0):
+    def __init__(self, id_cliente, nombre, telefono, correo, direccion="", total_compras=0, descuento=0):
         self.id_cliente = id_cliente
         self.nombre = nombre
         self.telefono = telefono
         self.correo = correo
+        self.direccion = direccion
         self.total_compras = total_compras
         self.descuento = descuento
 
@@ -193,34 +193,29 @@ class Gestion_Cliente:
         try:
             with open("clientes.txt","r", encoding="utf-8") as archivo:
                 for linea in archivo:
-                    linea=linea.strip()
+                    linea = linea.strip()
                     if linea:
-                        nit, nombre, direccion, telefono, correo =linea.split(":")
-                        self.clientes[nit]={
-                            "Nombre": nombre,
-                            "Direccion": direccion,
-                            "Telefono": telefono,
-                            "Correo": correo
-                        }
+                        nit, nombre, direccion, telefono, correo = linea.split(":")
+                        self.clientes[nit] = Cliente(
+                            id_cliente=nit,
+                            nombre=nombre,
+                            telefono=telefono,
+                            correo=correo,
+                            direccion=direccion
+                        )
             print("Clientes importados desde clientes.txt")
         except FileNotFoundError:
             print("No existe el archivo clientes.txt, se creará uno nuevo al guardar.")
 
     def guardar_cliente(self):
         with open("clientes.txt", "w", encoding="utf-8") as archivo:
-            for nit, datos in self.clientes.items():
-                archivo.write(f"{nit}: {datos['Nombre']}:{datos['Direccion']}:{datos['Telefono']}:{datos['Correo']}\n")
+            for nit, cliente in self.clientes.items():
+                archivo.write(f"{cliente.id_cliente}:{cliente.nombre}:{cliente.direccion}:{cliente.telefono}:{cliente.correo}\n")
 
-    def agregar_cliente(self,nit,nombre,direccion,telefono,correo):
-        self.clientes[nit]={
-            "Nombre": nombre,
-            "Direccion": direccion,
-            "Telefono": telefono,
-            "Correo": correo
-        }
+    def agregar_cliente(self, nit, nombre, direccion, telefono, correo):
+        self.clientes[nit] = Cliente(nit, nombre, telefono, correo, direccion)
         self.guardar_cliente()
-        print(f"Cliente con NIT {nit} se agrego y guardo correctamente.")
-
+        print(f"Cliente con NIT {nit} se agregó y guardó correctamente.")
 
     def asignar_descuento(self, nit, porcentaje):
         if nit in self.clientes:
@@ -244,10 +239,8 @@ class Gestion_Cliente:
     def mostrar_todos(self):
         if self.clientes:
             print("\nLista de clientes:")
-            for nit, datos in self.clientes.items():
-                print(f"\nNIT: {nit}")
-                for clave, valor in datos.items():
-                    print(f"{clave}: {valor}")
+            for nit, cliente in self.clientes.items():
+                print(cliente.mostrar_info())
         else:
             print("No hay clientes registrados.")
 
@@ -740,22 +733,44 @@ class Menu:
 
     def menu_cliente(self):
         while True:
-            print("\n--- MENÚ CLIENTE ---")
-            print("1. Ver productos")
-            print("2. Buscar producto")
-            print("3. Agregar cliente")
-            print("4. Volver")
-            opcion = input("Seleccione una opción: ")
+            print("\n--- MENÚ DE CLIENTES ---")
+            print("1. Agregar cliente")
+            print("2. Mostrar todos los clientes")
+            print("3. Buscar cliente")
+            print("4. Asignar descuento a cliente")
+            print("5. Listar clientes ordenados por compras")
+            print("6. Volver al menú principal")
+
+            opcion = input("Elige una opción: ")
+
             if opcion == "1":
-                self.gestion_productos.mostrar_productos()
+                nit = input("NIT: ")
+                nombre = input("Nombre: ")
+                direccion = input("Dirección: ")
+                telefono = input("Teléfono: ")
+                correo = input("Correo: ")
+                self.gestion_clientes.agregar_cliente(nit, nombre, direccion, telefono, correo)
+
             elif opcion == "2":
-                self.gestion_productos.buscar_producto()
+                self.gestion_clientes.mostrar_todos()
+
             elif opcion == "3":
-                self.gestion_clientes.agregar_cliente()
+                self.gestion_clientes.buscar_clientes()
+
             elif opcion == "4":
+                nit = input("Ingrese NIT del cliente: ")
+                porcentaje = input("Ingrese porcentaje de descuento: ")
+                self.gestion_clientes.asignar_descuento(nit, porcentaje)
+
+            elif opcion == "5":
+                self.gestion_clientes.listar_ordenados_por_compras()
+
+            elif opcion == "6":
+                print("Regresando al menú principal...")
                 break
+
             else:
-                print("Opción inválida.")
+                print("Opción inválida, intenta de nuevo.")
 
     def menu_proveedor(self):
         while True:
