@@ -689,8 +689,12 @@ class Menu:
             print("3. Eliminar producto")
             print("4. Buscar producto")
             print("5. Ordenar productos")
-            print("6. Volver")
+            print("6. Cambiar límite de stock")
+            print("7. Cargar productos desde TXT")
+            print("8. Guardar productos en TXT")
+            print("9. Volver")
             opcion = input("Seleccione una opción: ")
+
             if opcion == "1":
                 self.gestion_productos.agregar_producto()
             elif opcion == "2":
@@ -702,6 +706,17 @@ class Menu:
             elif opcion == "5":
                 self.gestion_productos.ordenar_productos(self.ordenador)
             elif opcion == "6":
+                nuevo = input(f"Limite actual = {self.gestion_productos.limite_stock}. Ingrese nuevo límite: ")
+                try:
+                    self.gestion_productos.guardar_limite_stock(int(nuevo))
+                except ValueError:
+                    print("Valor inválido. No se cambió el límite.")
+            elif opcion == "7":
+                self.gestion_productos.cargar_productos()
+            elif opcion == "8":
+                self.gestion_productos.guardar_productos()
+                print("Productos guardados en productos.txt")
+            elif opcion == "9":
                 break
             else:
                 print("Opción inválida.")
