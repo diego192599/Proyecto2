@@ -186,21 +186,47 @@ class Cliente:
 class Gestion_Cliente:
     def __init__(self, ordenador):
         self.clientes = {}
+        self.cargar_clientes()
         self.ordenador = ordenador
 
-    def agregar_cliente(self):
-        id_cliente = input("Ingrese el ID del cliente: ")
-        nombre = input("Ingrese su nombre: ")
-        telefono = input("Ingrese su número de teléfono: ")
-        correo = input("Ingrese su correo electrónico personal: ")
-        self.clientes[id_cliente] = Cliente(id_cliente, nombre, telefono, correo)
-        print(f"El cliente {nombre} se agregó correctamente.")
+    def cargar_clientes(self):
+        try:
+            with open("clientes.txt","r", encoding="utf-8") as archivo:
+                for linea in archivo:
+                    linea=linea.strip()
+                    if linea:
+                        nit, nombre, direccion, telefono, correo =linea.split(":")
+                        self.clientes[nit]={
+                            "Nombre": nombre,
+                            "Direccion": direccion,
+                            "Telefono": telefono,
+                            "Correo": correo
+                        }
+            print("Clientes importados desde clientes.txt")
+        except FileNotFoundError:
+            print("No existe el archivo clientes.txt, se creará uno nuevo al guardar.")
 
-    def asignar_descuento(self, id_cliente, porcentaje):
-        if id_cliente in self.clientes:
+    def guardar_cliente(self):
+        with open("clientes.txt", "w", encoding="utf-8") as archivo:
+            for nit, datos in self.clientes.items():
+                archivo.write(f"{nit}: {datos['Nombre']}:{datos['Direccion']}:{datos['Telefono']}:{datos['Correo']}\n")
+
+    def agregar_cliente(self,nit,nombre,direccion,telefono,correo):
+        self.clientes[nit]={
+            "Nombre": nombre,
+            "Direccion": direccion,
+            "Telefono": telefono,
+            "Correo": correo
+        }
+        self.guardar_cliente()
+        print(f"Cliente con NIT {nit} se agrego y guardo correctamente.")
+
+
+    def asignar_descuento(self, nit, porcentaje):
+        if nit in self.clientes:
             try:
-                self.clientes[id_cliente].descuento = float(porcentaje)
-                print(f"Descuento de {porcentaje}% asignado a {self.clientes[id_cliente].nombre}.")
+                self.clientes[nit].descuento = float(porcentaje)
+                print(f"Descuento de {porcentaje}% asignado a {self.clientes[nit].nombre}.")
             except ValueError:
                 print("Porcentaje de descuento inválido.")
         else:
@@ -215,12 +241,15 @@ class Gestion_Cliente:
         for c in ordenados:
             print(f"{c.nombre} - Compras: {c.total_compras} - Descuento: {c.descuento}%")
 
-    def mostrar_clientes(self):
-        if not self.clientes:
+    def mostrar_todos(self):
+        if self.clientes:
+            print("\nLista de clientes:")
+            for nit, datos in self.clientes.items():
+                print(f"\nNIT: {nit}")
+                for clave, valor in datos.items():
+                    print(f"{clave}: {valor}")
+        else:
             print("No hay clientes registrados.")
-            return
-        for c in self.clientes.values():
-            print(c.mostrar_info())
 
     def buscar_clientes(self):
         criterio = input("Ingrese el nombre o ID del cliente: ").lower()
