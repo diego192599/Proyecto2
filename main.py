@@ -529,13 +529,14 @@ class Gestion_pago:
 
 
 class Menu:
-    def __init__(self, gestion_productos, gestion_clientes, gestion_empleados, gestion_proveedores, gestion_compras, gestion_ventas):
+    def __init__(self, gestion_productos, gestion_clientes, gestion_empleados, gestion_proveedores, gestion_compras, gestion_ventas,gestion_pagos):
         self.gestion_productos = gestion_productos
         self.gestion_clientes = gestion_clientes
         self.gestion_empleados = gestion_empleados
         self.gestion_proveedores = gestion_proveedores
         self.gestion_compras = gestion_compras
         self.gestion_ventas = gestion_ventas
+        self.gestion_pagos=gestion_pagos
 
     def mostrar_menu(self):
         while True:
@@ -575,7 +576,8 @@ class Menu:
             print("2. Gestionar empleados")
             print("3. Gestionar proveedores")
             print("4. Ver compras registradas")
-            print("5. Volver")
+            print("5. Ver pagos registrados")
+            print("6. Volver")
             opcion = input("Seleccione una opción: ")
 
             match opcion:
@@ -588,6 +590,8 @@ class Menu:
                 case "4":
                     self.gestion_compras.mostrar_compras()
                 case "5":
+                    self.gestion_pagos.mostrar_pagos()
+                case "6":
                     break
                 case _:
                     print("Opción inválida.")
@@ -598,8 +602,9 @@ class Menu:
             print("\n--- MENÚ EMPLEADO ---")
             print("1. Registrar venta")
             print("2. Registrar compra")
-            print("3. Ver productos")
-            print("4. Volver")
+            print("3. Registrar pago")
+            print("4. Ver productos")
+            print("5. Volver")
             opcion = input("Seleccione una opción: ")
 
             match opcion:
@@ -608,8 +613,10 @@ class Menu:
                 case "2":
                     self.gestion_compras.registrar_compras()
                 case "3":
-                    self.gestion_productos.mostrar_productos()
+                    self.gestion_pagos.registrar_pago()
                 case "4":
+                    self.gestion_productos.mostrar_productos()
+                case "5":
                     break
                 case _:
                     print("Opción inválida.")
