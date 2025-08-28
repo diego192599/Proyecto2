@@ -1,4 +1,6 @@
 class Categorias:
+
+
     def __init__(self, id_categoria, nombre):
         self.id_categoria = id_categoria
         self.nombre = nombre
@@ -37,31 +39,35 @@ class Gestion_Productos:
     def __init__(self, categorias):
         self.productos = {}
         self.categorias = categorias
-        self.limite_stock=None
+        self.limite_stock = None
         self.cargar_productos()
 
     def cargar_productos(self):
         try:
             with open("productos.txt", "r", encoding="utf-8") as archivo:
                 for linea in archivo:
-                    linea = linea.split()
+                    linea = linea.strip()
                     if linea:
                         codigo, id_categoria, nombre, precio, stock = linea.split(",")
-                        self.productos[codigo] = {
-                            "id_categoria": id_categoria,
-                            "nombre": nombre,
-                            "precio": float(precio),
-                            "stock": int(stock)
-                        }
+
+                        self.productos[codigo] = Producto(
+                            codigo_producto=codigo,
+                            id_categoria=id_categoria,
+                            nombre=nombre,
+                            precio=float(precio),
+                            total_compras=0,
+                            total_ventas=0,
+                            stock=int(stock)
+                        )
             print("Productos importados desde productos.txt")
         except FileNotFoundError:
-         print("No existe el archivo productos.txt, se creará uno nuevo al guardar.")
+            print("No existe el archivo productos.txt, se creará uno nuevo al guardar.")
 
     def guardar_productos(self):
         with open("productos.txt", "w", encoding="utf-8") as archivo:
             for codigo, datos in self.productos.items():
                 archivo.write(
-                    f"{codigo},{datos['id_categoria']},{datos['nombre']},{datos['precio']},{datos['stock']}\n")
+                    f"{codigo},{datos.id_categoria},{datos.nombre},{datos.precio},{datos.stock}\n")
 
     def agregar_producto(self):
         contador = 0
@@ -85,12 +91,15 @@ class Gestion_Productos:
 
             stock = 0
 
-            self.productos[codigo_producto] = {
-                "id_categoria": id_categoria,
-                "nombre": nombre,
-                "precio": precio,
-                "stock": stock
-            }
+            self.productos[codigo_producto] = Producto(
+                codigo_producto=codigo_producto,
+                id_categoria=id_categoria,
+                nombre=nombre,
+                precio=precio,
+                total_compras=0,
+                total_ventas=0,
+                stock=stock
+            )
 
             self.guardar_productos()
             print(f"Producto '{nombre}' agregado y guardado correctamente con stock inicial {stock}.")
@@ -124,7 +133,7 @@ class Gestion_Productos:
                 print("Producto no encontrado.")
         elif opcion == "2":
             eliminar_lista = [codigo for codigo, prod in self.productos.items()
-                              if prod.stock > Gestion_Productos.limite_stock]
+                              if prod.stock > self.limite_stock]
             for codigo in eliminar_lista:
                 del self.productos[codigo]
             print(f"{len(eliminar_lista)} productos eliminados correctamente.")
@@ -319,7 +328,7 @@ class Gestion_empleado:
     def __init__(self, admin):
         self.admin = admin
         self.empleados = {}
-        self.carga_empleado()
+        self.cargar_empleados()
 
     def cargar_empleados(self):
         try:
@@ -401,26 +410,42 @@ class Gestion_empleado:
         else:
             print("No hay ningún empleado con ese ID.")
 
-
-class Proveedor:
-    def __init__(self, id_proveedor, nombre, empresa, telefono, direccion, correo, id_categoria):
-        self.id_proveedor = id_proveedor
-        self.nombre = nombre
-        self.empresa = empresa
-        self.telefono = telefono
-        self.direccion = direccion
-        self.correo = correo
-        self.id_categoria = id_categoria
-
-    def mostrar_info(self, categorias):
-        categoria_nombre = categorias.categorias[self.id_categoria].nombre
-        return f"[{self.id_proveedor}] {self.nombre} ({self.empresa}) - Categoría: {categoria_nombre}"
-
-
 class Gestion_Proveedor:
     def __init__(self, categorias):
         self.proveedores = {}
         self.categorias = categorias
+        self.cargar_proveedores()
+
+    def cargar_proveedores(self):
+        try:
+            with open("proveedores.txt", "r", encoding="utf-8") as f:
+                for linea in f:
+                    linea = linea.strip()
+                    if not linea:
+                        continue
+                    try:
+
+                        id_prov, nombre, empresa, telefono, direccion, correo, id_categoria = linea.split(":")
+                        self.proveedores[id_prov] = {
+                            "Nombre": nombre,
+                            "Empresa": empresa,
+                            "Telefono": telefono,
+                            "Direccion": direccion,
+                            "Correo": correo,
+                            "ID_Categoria": id_categoria
+                        }
+                    except ValueError:
+                        print(f"Línea malformada en proveedores.txt: {linea}")
+            print("Proveedores cargados desde proveedores.txt")
+        except FileNotFoundError:
+            print("No existe proveedores.txt, se creará uno nuevo al guardar.")
+
+    def guardar_proveedores(self):
+        with open("proveedores.txt", "w", encoding="utf-8") as f:
+            for id_prov, datos in self.proveedores.items():
+                f.write(f"{id_prov}:{datos['Nombre']}:{datos['Empresa']}:{datos['Telefono']}:"
+                        f"{datos['Direccion']}:{datos['Correo']}:{datos['ID_Categoria']}\n")
+        print("Proveedores guardados correctamente.")
 
     def agregar_proveedor(self):
         id_proveedor = input("Ingrese el ID del proveedor: ")
@@ -437,16 +462,25 @@ class Gestion_Proveedor:
             print("La categoría no existe.")
             return
 
-        self.proveedores[id_proveedor] = Proveedor(id_proveedor, nombre, empresa, telefono, direccion, correo,
-                                                   id_categoria)
-        print("Se agregó correctamente el proveedor.")
+        self.proveedores[id_proveedor] = {
+            "Nombre": nombre,
+            "Empresa": empresa,
+            "Telefono": telefono,
+            "Direccion": direccion,
+            "Correo": correo,
+            "ID_Categoria": id_categoria
+        }
+        print("Proveedor agregado correctamente.")
 
     def mostrar_proveedores(self):
         if not self.proveedores:
             print("No hay proveedores registrados.")
             return
-        for p in self.proveedores.values():
-            print(p.mostrar_info(self.categorias))
+        print("\n--- Lista de Proveedores ---")
+        for id_prov, datos in self.proveedores.items():
+            categoria_nombre = self.categorias.categorias.get(datos["ID_Categoria"], "Sin categoría")
+            print(f"[{id_prov}] {datos['Nombre']} ({datos['Empresa']}) - "
+                  f"Tel: {datos['Telefono']} - Correo: {datos['Correo']} - Categoría: {categoria_nombre}")
 
 
 class DetalleVenta:
@@ -792,13 +826,19 @@ class Menu:
             print("\n--- GESTIÓN DE PROVEEDORES ---")
             print("1. Agregar proveedor")
             print("2. Mostrar proveedores")
-            print("3. Volver")
+            print("3. Cargar proveedores desde TXT")
+            print("4. Guardar proveedores en TXT")
+            print("5. Volver")
             opcion = input("Seleccione una opción: ")
             if opcion == "1":
                 self.gestion_proveedores.agregar_proveedor()
             elif opcion == "2":
                 self.gestion_proveedores.mostrar_proveedores()
             elif opcion == "3":
+                self.gestion_proveedores.cargar_proveedores()
+            elif opcion == "4":
+                self.gestion_proveedores.guardar_proveedores()
+            elif opcion == "5":
                 break
             else:
                 print("Opción inválida.")
