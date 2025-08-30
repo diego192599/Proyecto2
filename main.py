@@ -6,7 +6,7 @@ class Categorias:
 
 
 class Producto:
-    def __init__(self, codigo_producto, id_categoria, nombre, precio, total_compras, total_ventas, stock):
+    def __init__(self, codigo_producto, id_categoria, nombre, precio, total_compras, total_ventas, stock,limite_stock):
         self.codigo_producto = codigo_producto
         self.id_categoria = id_categoria
         self.nombre = nombre
@@ -14,9 +14,13 @@ class Producto:
         self.total_compras = total_compras
         self.total_ventas = total_ventas
         self.stock = stock
+        self.limite_stock=limite_stock
 
     def actualizar_stock(self, cantidad, tipo):
         if tipo == 'compra':
+            if self.limite_stock is not None and self.stock + cantidad > self.limite_stock:
+                print(f"No se puede agregar la compra. Excede el límite de stock ({self.limite_stock}).")
+                return False
             self.stock += cantidad
             self.total_compras += cantidad
             return True
@@ -56,7 +60,8 @@ class Gestion_Productos:
                             precio=float(precio),
                             total_compras=0,
                             total_ventas=0,
-                            stock=int(stock)
+                            stock=int(stock),
+                            limite_stock=None
                         )
             print("Productos importados desde productos.txt")
         except FileNotFoundError:
@@ -84,8 +89,10 @@ class Gestion_Productos:
             nombre = input("Nombre del producto: ")
             try:
                 precio = float(input("Precio del producto: "))
+                limite = input("Ingrese límite máximo de stock (opcional, dejar vacío si no hay límite): ")
+                limite_stock = int(limite) if limite else None
             except ValueError:
-                print("Precio inválido. Inténtelo de nuevo.")
+                print("Valor inválido. Inténtelo de nuevo.")
                 continue
 
             stock = 0
@@ -97,7 +104,8 @@ class Gestion_Productos:
                 precio=precio,
                 total_compras=0,
                 total_ventas=0,
-                stock=stock
+                stock=stock,
+                limite_stock=limite_stock
             )
 
             self.guardar_productos()
@@ -113,8 +121,9 @@ class Gestion_Productos:
             print("No hay productos registrados.")
             return
         for p in self.productos.values():
-            categoria = self.categorias.categorias[p.id_categoria]
-            print(f"[{p.codigo_producto}] {p.nombre} | Precio: {p.precio:.2f} | Categoría: {categoria.nombre} | Stock: {p.stock}")
+            categoria_obj = self.categorias.categorias.get(p.id_categoria)
+            categoria_nombre = categoria_obj.nombre if categoria_obj else "Categoría no encontrada"
+            print(f"[{p.codigo_producto}] {p.nombre} | Precio: {p.precio:.2f} | Categoría: {categoria_nombre} | Stock: {p.stock}")
 
     def eliminar_producto(self):
         if not self.productos:
@@ -423,7 +432,6 @@ class Gestion_Proveedor:
                     if not linea:
                         continue
                     try:
-
                         id_prov, nombre, empresa, telefono, direccion, correo, id_categoria = linea.split(":")
                         self.proveedores[id_prov] = {
                             "Nombre": nombre,
@@ -470,6 +478,7 @@ class Gestion_Proveedor:
             "ID_Categoria": id_categoria
         }
         print("Proveedor agregado correctamente.")
+        self.guardar_proveedores()
 
     def mostrar_proveedores(self):
         if not self.proveedores:
@@ -522,8 +531,10 @@ class Compra:
         self.detalles.append(detalle)
 
     def calcular_total(self):
-        return sum(d.subtotal for d in self.detalles)
-
+        total = 0
+        for detalle in self.detalles:
+            total += detalle.subtotal
+        return total
 
 class DetalleCompra:
     def __init__(self, id_detalle, id_compra, codigo_producto, cantidad, precio_compra, fecha_caducidad):
@@ -590,7 +601,6 @@ class Gestion_Venta:
         self.ventas[id_venta] = venta
         print(f"Venta registrada. Total: {total_venta:.2f}")
 
-
 class Gestion_Compra:
     def __init__(self, productos, proveedores):
         self.compras = {}
@@ -618,11 +628,18 @@ class Gestion_Compra:
                 print("Producto no encontrado.")
                 continue
 
+            producto = self.productos.productos[codigo_producto]
+
             try:
                 cantidad = int(input("Cantidad: "))
+                limite = int(input("Ingrese límite máximo de stock para este producto: "))
                 precio = float(input("Precio de compra: "))
             except ValueError:
                 print("Valores inválidos. Inténtelo de nuevo.")
+                continue
+
+            if producto.stock + cantidad > limite:
+                print(f"No se puede agregar la compra. Excede el límite de stock ({limite}).")
                 continue
 
             fecha_caducidad = input("Fecha de caducidad (YYYY-MM-DD): ")
@@ -637,7 +654,6 @@ class Gestion_Compra:
             )
 
             compra.agregar_detalle(detalle)
-            producto = self.productos.productos[codigo_producto]
             producto.actualizar_stock(cantidad, 'compra')
             total_compra += detalle.subtotal
 
@@ -648,26 +664,49 @@ class Gestion_Compra:
         if not self.compras:
             print("No hay compras registradas.")
             return
-
-        print("\n--- LISTA DE COMPRAS ---")
         for id_compra, compra in self.compras.items():
-            print(f"\nID Compra: {id_compra} | Fecha: {compra.fecha} | Proveedor: {compra.id_proveedor} | Empleado: {compra.id_empleado}")
+            print(f"\nID Compra: {id_compra}")
+            print(f"Fecha: {compra.fecha}")
+            print(f"Proveedor: {compra.id_proveedor}")
+            print(f"Empleado: {compra.id_empleado}")
             print("Detalles:")
+            total_compra = 0
             for detalle in compra.detalles:
-                print(f"  Producto: {detalle.codigo_producto} | Cantidad: {detalle.cantidad} | Precio: {detalle.precio_compra:.2f} | Subtotal: {detalle.subtotal:.2f}")
-            total = sum(det.subtotal for det in compra.detalles)
-            print(f"Total de la compra: {total:.2f}")
+                print(f"  - Producto: {detalle.codigo_producto}, Cantidad: {detalle.cantidad}, Precio: {detalle.precio_compra}, Subtotal: {detalle.subtotal}")
+                total_compra += detalle.subtotal
+            print(f"Total de la compra: {total_compra:.2f}")
+
 
 
 class Gestion_Categoria:
     def __init__(self):
         self.categorias = {}
+        self.cargar_categorias()
+
+    def cargar_categorias(self):
+        try:
+            with open("categorias.txt", "r", encoding="utf-8") as f:
+                for linea in f:
+                    id_cat, nombre = linea.strip().split(":")
+                    self.categorias[id_cat] = Categorias(id_cat, nombre)
+            print("Categorías cargadas desde categorias.txt")
+        except FileNotFoundError:
+            print("No existe categorias.txt, se creará uno nuevo al guardar.")
+        except ValueError:
+            print("Error al leer categorias.txt. Verifique el formato.")
+
+    def guardar_categorias(self):
+        with open("categorias.txt", "w", encoding="utf-8") as f:
+            for id_cat, cat_obj in self.categorias.items():
+                f.write(f"{cat_obj.id_categoria}:{cat_obj.nombre}\n")
+        print("Categorías guardadas correctamente.")
 
     def agregar_categoria(self):
         id_categoria = input("Ingrese el ID de la categoría: ")
         nombre = input("Ingrese el nombre de la categoría: ")
         self.categorias[id_categoria] = Categorias(id_categoria, nombre)
-        print(f"Categoría '{nombre}' agregada correctamente.")
+        self.guardar_categorias()
+        print(f"Categoría '{nombre}' agregada y guardada correctamente.")
 
     def mostrar_categorias(self):
         if not self.categorias:
@@ -745,6 +784,7 @@ class Menu:
                 break
             else:
                 print("Opción inválida.")
+
     def menu_gestionar_categorias(self):
         while True:
             print("\n--- GESTIÓN DE CATEGORÍAS ---")
@@ -786,34 +826,22 @@ class Menu:
             elif opcion == "5":
                 self.gestion_productos.ordenar_productos(self.ordenador)
             elif opcion == "6":
-                nuevo = input(f"Limite actual = {self.gestion_productos.limite_stock}. Ingrese nuevo límite: ")
-                try:
-                    self.gestion_productos.guardar_limite_stock(int(nuevo))
-                except ValueError:
-                    print("Valor inválido. No se cambió el límite.")
+                codigo = input("Ingrese el código del producto para cambiar el límite de stock: ")
+                if codigo in self.gestion_productos.productos:
+                    limite = input("Ingrese nuevo límite máximo de stock: ")
+                    try:
+                        self.gestion_productos.productos[codigo].limite_stock = int(limite)
+                        print(f"Límite de stock actualizado para {self.gestion_productos.productos[codigo].nombre}.")
+                    except ValueError:
+                        print("Valor inválido. Inténtelo de nuevo.")
+                else:
+                    print("Producto no encontrado.")
             elif opcion == "7":
                 self.gestion_productos.cargar_productos()
             elif opcion == "8":
                 self.gestion_productos.guardar_productos()
-                print("Productos guardados en productos.txt")
+                print("Productos guardados correctamente en productos.txt.")
             elif opcion == "9":
-                break
-            else:
-                print("Opción inválida.")
-
-    def menu_gestionar_compras(self):
-        while True:
-            print("\n--- GESTIÓN DE COMPRAS ---")
-            print("1. Registrar compra")
-            print("2. Mostrar compras")
-            print("3. Volver")
-            opcion = input("Seleccione una opción: ")
-
-            if opcion == "1":
-                self.gestion_compras.registrar_compra(self.gestion_productos, self.gestion_proveedores)
-            elif opcion == "2":
-                self.gestion_compras.mostrar_compras()
-            elif opcion == "3":
                 break
             else:
                 print("Opción inválida.")
@@ -822,28 +850,20 @@ class Menu:
         while True:
             print("\n--- GESTIÓN DE EMPLEADOS ---")
             print("1. Agregar empleado")
-            print("2. Mostrar empleados")
-            print("3. Buscar empleado")
-            print("4. Despedir empleado")
-            print("5. Cargar empleados desde TXT")
-            print("6. Guardar empleados en TXT")
-            print("7. Volver")
+            print("2. Despedir empleado")
+            print("3. Mostrar empleados")
+            print("4. Buscar empleado")
+            print("5. Volver")
             opcion = input("Seleccione una opción: ")
-
             if opcion == "1":
-                self.gestion_empleados.agregar_empleado("admin123")
+                self.gestion_empleados.agregar_empleado()
             elif opcion == "2":
-                self.gestion_empleados.mostrar_empleados()
-            elif opcion == "3":
-                self.gestion_empleados.buscar_empleado()
-            elif opcion == "4":
                 self.gestion_empleados.despedir_empleado()
+            elif opcion == "3":
+                self.gestion_empleados.mostrar_empleados()
+            elif opcion == "4":
+                self.gestion_empleados.buscar_empleado()
             elif opcion == "5":
-                self.gestion_empleados.cargar_empleados()
-            elif opcion == "6":
-                self.gestion_empleados.guardar_empleados()
-                print("Empleados guardados en empleados.txt")
-            elif opcion == "7":
                 break
             else:
                 print("Opción inválida.")
@@ -853,19 +873,14 @@ class Menu:
             print("\n--- GESTIÓN DE PROVEEDORES ---")
             print("1. Agregar proveedor")
             print("2. Mostrar proveedores")
-            print("3. Cargar proveedores desde TXT")
-            print("4. Guardar proveedores en TXT")
-            print("5. Volver")
+            print("3. Volver")
             opcion = input("Seleccione una opción: ")
             if opcion == "1":
                 self.gestion_proveedores.agregar_proveedor()
             elif opcion == "2":
                 self.gestion_proveedores.mostrar_proveedores()
             elif opcion == "3":
-                self.gestion_proveedores.cargar_proveedores()
-            elif opcion == "4":
                 self.gestion_proveedores.guardar_proveedores()
-            elif opcion == "5":
                 break
             else:
                 print("Opción inválida.")
