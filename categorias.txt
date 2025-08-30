@@ -1,1 +1,3 @@
 001:pastillas
+006:nose
+007:nose2
