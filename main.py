@@ -74,8 +74,7 @@ class Gestion_Productos:
 
         with open("productos.txt", "w", encoding="utf-8") as archivo:
             for codigo, datos in self.productos.items():
-                archivo.write(
-                    f"{codigo},{datos.id_categoria},{datos.nombre},{datos.precio},{datos.stock},{datos.limite_stock}\n")
+                archivo.write(f"{codigo},{datos.id_categoria},{datos.nombre},{datos.precio},{datos.stock},{datos.limite_stock}\n")
 
     def agregar_producto(self):
 
@@ -454,13 +453,12 @@ class Gestion_empleado:
             print(f"[{id_emp}] {datos['Nombre']} | Tel: {datos['Telefono']} | Correo: {datos['Correo']}")
 
     def buscar_empleado(self):
-
         criterio = input("Ingrese el ID o nombre: ").lower()
-        encontrados = [e for e in self.empleados.values()
-                       if criterio in e['Nombre'].lower()]
+        encontrados = [(id_emp, e) for id_emp, e in self.empleados.items() if
+                       criterio in e['Nombre'].lower() or criterio == id_emp.lower()]
         if encontrados:
-            for e in encontrados:
-                print(f"[{e['ID']}] {e['Nombre']} - Tel: {e['Telefono']}")
+            for id_emp, e in encontrados:
+                print(f"[{id_emp}] {e['Nombre']} - Tel: {e['Telefono']}")
         else:
             print("Empleado no encontrado.")
 
@@ -919,7 +917,7 @@ class Menu:
 
     def menu_gestionar_empleados(self):
 
-     while True:
+        while True:
             print("\n--- GESTIÓN DE EMPLEADOS ---")
             print("1. Agregar empleado")
             print("2. Despedir empleado")
@@ -940,7 +938,7 @@ class Menu:
 
     def menu_gestionar_proveedores(self):
 
-      while True:
+        while True:
             print("\n--- GESTIÓN DE PROVEEDORES ---")
             print("1. Agregar proveedor")
             print("2. Mostrar proveedores")
