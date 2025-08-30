@@ -1,6 +1,5 @@
 class Categorias:
 
-
     def __init__(self, id_categoria, nombre):
         self.id_categoria = id_categoria
         self.nombre = nombre
@@ -536,7 +535,6 @@ class DetalleCompra:
         self.fecha_caducidad = fecha_caducidad
         self.subtotal = cantidad * precio_compra
 
-
 class Gestion_Venta:
     def __init__(self, productos, clientes, empleados):
         self.ventas = {}
@@ -646,6 +644,20 @@ class Gestion_Compra:
         self.compras[id_compra] = compra
         print(f"Compra registrada. Total: {total_compra:.2f}")
 
+    def mostrar_compras(self):
+        if not self.compras:
+            print("No hay compras registradas.")
+            return
+
+        print("\n--- LISTA DE COMPRAS ---")
+        for id_compra, compra in self.compras.items():
+            print(f"\nID Compra: {id_compra} | Fecha: {compra.fecha} | Proveedor: {compra.id_proveedor} | Empleado: {compra.id_empleado}")
+            print("Detalles:")
+            for detalle in compra.detalles:
+                print(f"  Producto: {detalle.codigo_producto} | Cantidad: {detalle.cantidad} | Precio: {detalle.precio_compra:.2f} | Subtotal: {detalle.subtotal:.2f}")
+            total = sum(det.subtotal for det in compra.detalles)
+            print(f"Total de la compra: {total:.2f}")
+
 
 class Gestion_Categoria:
     def __init__(self):
@@ -728,13 +740,11 @@ class Menu:
             elif opcion == "4":
                 self.menu_gestionar_proveedores()
             elif opcion == "5":
-                print("Compras registradas: ")
-                # Lógica para mostrar compras
+                self.gestion_compras.mostrar_compras()
             elif opcion == "6":
                 break
             else:
                 print("Opción inválida.")
-
     def menu_gestionar_categorias(self):
         while True:
             print("\n--- GESTIÓN DE CATEGORÍAS ---")
@@ -787,6 +797,23 @@ class Menu:
                 self.gestion_productos.guardar_productos()
                 print("Productos guardados en productos.txt")
             elif opcion == "9":
+                break
+            else:
+                print("Opción inválida.")
+
+    def menu_gestionar_compras(self):
+        while True:
+            print("\n--- GESTIÓN DE COMPRAS ---")
+            print("1. Registrar compra")
+            print("2. Mostrar compras")
+            print("3. Volver")
+            opcion = input("Seleccione una opción: ")
+
+            if opcion == "1":
+                self.gestion_compras.registrar_compra(self.gestion_productos, self.gestion_proveedores)
+            elif opcion == "2":
+                self.gestion_compras.mostrar_compras()
+            elif opcion == "3":
                 break
             else:
                 print("Opción inválida.")
